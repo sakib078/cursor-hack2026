@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from chat import router as chat_router
+from upload import router as upload_router
 from session_store import Session, new_session_id, sessions
 
 load_dotenv()
@@ -32,13 +33,7 @@ app.add_middleware(
 )
 
 app.include_router(chat_router)
-
-# --------------------------------------------------------------------------- #
-# TEAMMATES (Steps 1-2): plug your upload/processing router in here, e.g.
-#     from upload import router as upload_router
-#     app.include_router(upload_router)
-# It must create sessions per the contract in session_store.py.
-# --------------------------------------------------------------------------- #
+app.include_router(upload_router)  # Steps 1-2
 
 
 @app.get("/api/health")
