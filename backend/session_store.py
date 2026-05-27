@@ -49,6 +49,7 @@ class Session:
     persona_prompt: str = ""
     relationship: Optional[str] = None
     photo_url: Optional[str] = None
+    agent_id: Optional[str] = None  # ElevenLabs ConvAI agent
     history: List[Message] = field(default_factory=list)
 
 
