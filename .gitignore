@@ -13,3 +13,9 @@ frontend/.env.local
 
 # OS
 .DS_Store
+
+# Private chat exports — NEVER commit these
+*.txt
+*.json.chat
+WhatsApp*
+Telegram*
