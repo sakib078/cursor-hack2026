@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: var(--font-inter);
+}
+
+@theme inline {
+  --color-background: #0c0a09;
+  --color-foreground: #fafaf9;
+  --font-sans: var(--font-inter);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #44403c transparent;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.typing-dot {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
