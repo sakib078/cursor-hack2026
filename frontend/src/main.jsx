@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import ChatRoom from "./ChatRoom.jsx";
+import VoiceAgent from "./VoiceAgent.jsx";
 import Landing from "./Landing.jsx";
 import "./theme.css";
 
@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <Routes>
         {/* Steps 3-4 (this app). */}
-        <Route path="/chat/:sessionId" element={<ChatRoom />} />
+        <Route path="/chat/:sessionId" element={<VoiceAgent />} />
         {/*
           "/" is the upload page owned by teammates (Steps 1-2).
           Until that lands, this dev placeholder lets us seed + enter a chat.
