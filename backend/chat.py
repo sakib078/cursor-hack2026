@@ -24,9 +24,8 @@ from session_store import Message, sessions
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 ELEVEN_MODEL = os.getenv("ELEVENLABS_MODEL", "eleven_turbo_v2")
-MAX_TOKENS = 400
 
 
 # --------------------------------------------------------------------------- #
@@ -45,30 +44,35 @@ class ChatResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
-# Claude
+# Gemini
 # --------------------------------------------------------------------------- #
 def _generate_reply(system_prompt: str, history: list[Message], user_message: str) -> str:
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise HTTPException(503, "ANTHROPIC_API_KEY is not set on the server.")
+        raise HTTPException(503, "GEMINI_API_KEY is not set on the server.")
 
-    # Imported lazily so the server still boots without the SDK installed.
-    from anthropic import Anthropic
+    import google.generativeai as genai
 
-    messages = [{"role": m.role, "content": m.content} for m in history]
-    messages.append({"role": "user", "content": user_message})
+    genai.configure(api_key=api_key)
+
+    # Gemini uses "model" instead of "assistant" for the AI role
+    gemini_history = [
+        {"role": "user" if m.role == "user" else "model", "parts": [m.content]}
+        for m in history
+    ]
+
+    model = genai.GenerativeModel(
+        model_name=GEMINI_MODEL,
+        system_instruction=system_prompt,
+    )
 
     try:
-        resp = Anthropic(api_key=api_key).messages.create(
-            model=CLAUDE_MODEL,
-            max_tokens=MAX_TOKENS,
-            system=system_prompt,
-            messages=messages,
-        )
-    except Exception as exc:  # surface upstream errors cleanly to the UI
-        raise HTTPException(502, f"Claude request failed: {exc}") from exc
+        chat = model.start_chat(history=gemini_history)
+        resp = chat.send_message(user_message)
+    except Exception as exc:
+        raise HTTPException(502, f"Gemini request failed: {exc}") from exc
 
-    return "".join(block.text for block in resp.content if block.type == "text").strip()
+    return resp.text.strip()
 
 
 # --------------------------------------------------------------------------- #

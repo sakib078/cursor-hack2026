@@ -16,13 +16,15 @@ export default function Landing() {
   const [name, setName] = useState("");
   const [relationship, setRelationship] = useState("");
   const [chatFile, setChatFile] = useState(null);
-  const [audioFile, setAudioFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !chatFile) return;
+    if (!name.trim() || !chatFile) {
+      setError("Please enter a name and upload a chat file.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -30,14 +32,17 @@ export default function Landing() {
     const form = new FormData();
     form.append("name", name.trim());
     form.append("relationship", relationship.trim() || "person");
-    form.append("chat_file", chatFile);
-    if (audioFile) form.append("audio_file", audioFile);
+    form.append("chat_file", chatFile, chatFile.name);
 
     try {
       const res = await fetch(`${API}/api/create`, { method: "POST", body: form });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.detail || res.statusText);
+        // FastAPI 422 detail is an array; pick the first message
+        const msg = Array.isArray(data.detail)
+          ? data.detail.map((e) => e.msg).join(", ")
+          : (data.detail || res.statusText);
+        throw new Error(msg);
       }
       const { session_id } = await res.json();
       navigate(`/chat/${session_id}`);
@@ -124,18 +129,6 @@ export default function Landing() {
                   label="Drop chat export here, or click to browse"
                   file={chatFile}
                   onChange={setChatFile}
-                />
-              </Field>
-
-              <Field
-                label="Their voice"
-                hint="Voice note, video, voicemail — anything they spoke in (optional)"
-              >
-                <FileZone
-                  accept="audio/*,video/*,.mp3,.mp4,.m4a,.ogg,.wav,.webm"
-                  label="Drop audio / video here, or click to browse"
-                  file={audioFile}
-                  onChange={setAudioFile}
                 />
               </Field>
 
