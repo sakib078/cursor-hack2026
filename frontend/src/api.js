@@ -26,6 +26,10 @@ export function sendMessage(sessionId, message, mode) {
   }).then(jsonOrThrow);
 }
 
+export function getVoiceToken(sessionId) {
+  return fetch(`${BASE}/api/voice-token/${sessionId}`).then(jsonOrThrow);
+}
+
 // Dev-only: create a test session (requires AFTERWORDS_DEV_SEED=1 on backend).
 export function seedDevSession() {
   return fetch(`${BASE}/api/_dev/seed`, { method: "POST" }).then(jsonOrThrow);
